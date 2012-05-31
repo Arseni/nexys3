@@ -45,6 +45,11 @@ begin
 		sseg_sel <= sseg_sel + 1;
 end
 
+assign digit[0] = value[7:4];
+assign digit[1] = value[3:0];
+
+assign dp = 1;
+
 assign sseg_sig =
 	sseg_sel == 'd0 ? sseg_sig_mux[0] :
 	sseg_sel == 'd1 ? sseg_sig_mux[1] :

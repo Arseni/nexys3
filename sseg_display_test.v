@@ -58,6 +58,11 @@ module sseg_display_test;
 			#10;
 		end
 	end
+	
+	always begin
+		#100;
+		value = value + 1;
+	end
       
 endmodule
 
