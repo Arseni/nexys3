@@ -20,28 +20,36 @@
 //////////////////////////////////////////////////////////////////////////////////
 module sseg_display
 (
+	input rst,
 	input clk,
-	input wire [3:0] digit [0:3],
-	input wire dp [0:3],
-	output wire [3:0] sseg_sel,
+	input wire [7:0] value,
+	output wire [3:0] sseg_an,
 	output wire [7:0] sseg_sig
 );
 
-wire [7:0] sseg_sig_mux [0:3];
-reg [2:0] enable;
+wire dp;
+wire [3:0] digit [3:0];
+wire [7:0] sseg_sig_mux [3:0];
+reg [1:0] sseg_sel;
 
-sseg sseg0 [3:0] (digit, dp, sseg_sig_mux);
+sseg sseg0 (digit[0], dp, sseg_sig_mux[0]);
+sseg sseg1 (digit[1], dp, sseg_sig_mux[1]);
+sseg sseg2 (digit[2], dp, sseg_sig_mux[2]);
+sseg sseg3 (digit[3], dp, sseg_sig_mux[3]);
 
-always @(posedge clk)
+always @(posedge clk or rst)
 begin
-	enable <= enable + 1;
+	if(rst == 1)
+		sseg_sel <= 'b0;
+	else
+		sseg_sel <= sseg_sel + 1;
 end
 
 assign sseg_sig =
-	enable == 'd0 ? sseg_sig_mux[0] :
-	enable == 'd1 ? sseg_sig_mux[1] :
-	enable == 'd2 ? sseg_sig_mux[2] :
-	enable == 'd3 ? sseg_sig_mux[3] :
+	sseg_sel == 'd0 ? sseg_sig_mux[0] :
+	sseg_sel == 'd1 ? sseg_sig_mux[1] :
+	sseg_sel == 'd2 ? sseg_sig_mux[2] :
+	sseg_sel == 'd3 ? sseg_sig_mux[3] :
 	'bZ;
 
 endmodule
