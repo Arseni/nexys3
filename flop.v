@@ -24,16 +24,56 @@ module flop
 	output reg [12:0] result
 );
 
-wire signOne, signTwo, signResult;
-wire [3:0] expOne, expTwo, expResult;
-wire [7:0] mantOne, mantTwo, mantResult;
+reg signBig, signSmall, signResult;
+reg [3:0] expBig, expSmall, expDiff, normalizer, expResult;
+reg [7:0] mantBig, mantSmall, mantSmallAligned, mantResult;
+reg [8:0] mantSum;
 
-assign signOne = one[12];
-assign signTwo = other[12];
-assign expOne = one[11:8];
-assign expTwo = other[11:8];
-assign mantOne = one[7:0];
-assign mantOther = other[7:0];
+always @*
+begin
+	if (one[11:0] > other[11:0])
+	begin
+		signBig = one[12];
+		signSmall = other[12];
+		expBig = one [11:4];
+		expSmall = other[11:4];
+		mantBig = one[3:0];
+		mantSmall = other[3:0];
+	end
+	else
+	begin
+		signBig = other[12];
+		signSmall = one[12];
+		expBig = other[11:4];
+		expSmall = one[11:4];
+		mantBig = other[3:0];
+		mantSmall = one[3:0];
+	end
+end
+
+expDiff = expBig - expSmall;
+mantSmallAligned = mantSmall >> expDiff;
+
+mantSum = signBig == signSmall ?
+			{1'0b, mantBig} + {1'0b, mantSmallAligned}:
+			{1'0b, mantBig} - {1'0b, mantSmallAligned};
+			
+normalizer = mantSum[7] ? '0o :
+			 mantSum[6] ? '1o :
+			 mantSum[5] ? '2o :
+			 mantSum[4] ? '3o :
+			 mantSum[3] ? '4o :
+			 mantSum[2] ? '5o :
+			 mantSum[1] ? '6o :
+			 '7o;
+			 
+mantResult = mantSum << normalizer;
+expResult = mantSum[8] ? 
+				expBig - normalizer + 1:
+				expBig - normalizer;
+signResult = signBig == signSmall ? 1 : signBig;
+
+result = {signResult, mantResult, expResult};
 
 // Seite 109
 
