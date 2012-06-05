@@ -49,32 +49,32 @@ begin
 		mantBig = other[3:0];
 		mantSmall = one[3:0];
 	end
-end
 
-expDiff = expBig - expSmall;
-mantSmallAligned = mantSmall >> expDiff;
+	expDiff = expBig - expSmall;
+	mantSmallAligned = mantSmall >> expDiff;
 
-mantSum = signBig == signSmall ?
-			{1'0b, mantBig} + {1'0b, mantSmallAligned}:
-			{1'0b, mantBig} - {1'0b, mantSmallAligned};
-			
-normalizer = mantSum[7] ? '0o :
-			 mantSum[6] ? '1o :
-			 mantSum[5] ? '2o :
-			 mantSum[4] ? '3o :
-			 mantSum[3] ? '4o :
-			 mantSum[2] ? '5o :
-			 mantSum[1] ? '6o :
-			 '7o;
-			 
-mantResult = mantSum << normalizer;
-expResult = mantSum[8] ? 
-				expBig - normalizer + 1:
-				expBig - normalizer;
-signResult = signBig == signSmall ? 1 : signBig;
+	mantSum = signBig == signSmall ?
+				{1'0b, mantBig} + {1'0b, mantSmallAligned}:
+				{1'0b, mantBig} - {1'0b, mantSmallAligned};
+				
+	normalizer = mantSum[7] ? '0o :
+				 mantSum[6] ? '1o :
+				 mantSum[5] ? '2o :
+				 mantSum[4] ? '3o :
+				 mantSum[3] ? '4o :
+				 mantSum[2] ? '5o :
+				 mantSum[1] ? '6o :
+				 '7o;
+				 
+	mantResult = mantSum << normalizer;
+	expResult = mantSum[8] ? 
+					expBig - normalizer + 1:
+					expBig - normalizer;
+	signResult = signBig == signSmall ? 1 : signBig;
 
-result = {signResult, mantResult, expResult};
-
+	result = {signResult, mantResult, expResult};
+	
+end // always @*
 // Seite 109
 
 endmodule
