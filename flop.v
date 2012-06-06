@@ -54,17 +54,17 @@ begin
 	mantSmallAligned = mantSmall >> expDiff;
 
 	mantSum = signBig == signSmall ?
-				{1'0b, mantBig} + {1'0b, mantSmallAligned}:
-				{1'0b, mantBig} - {1'0b, mantSmallAligned};
+				{1'b0, mantBig} + {1'b0, mantSmallAligned}:
+				{1'b0, mantBig} - {1'b0, mantSmallAligned};
 				
-	normalizer = mantSum[7] ? '0o :
-				 mantSum[6] ? '1o :
-				 mantSum[5] ? '2o :
-				 mantSum[4] ? '3o :
-				 mantSum[3] ? '4o :
-				 mantSum[2] ? '5o :
-				 mantSum[1] ? '6o :
-				 '7o;
+	normalizer = mantSum[7] ? 'o0 :
+				 mantSum[6] ? 'o1 :
+				 mantSum[5] ? 'o2 :
+				 mantSum[4] ? 'o3 :
+				 mantSum[3] ? 'o4 :
+				 mantSum[2] ? 'o5 :
+				 mantSum[1] ? 'o6 :
+				 'o7;
 				 
 	mantResult = mantSum << normalizer;
 	expResult = mantSum[8] ? 
