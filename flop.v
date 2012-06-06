@@ -31,7 +31,7 @@ reg [8:0] mantSum;
 
 always @*
 begin
-	if (one[11:0] > other[11:0])
+	if ({one[3:0], one[11:4]} > {other[3:0], other[11:4]}) // set exp to most significant for check
 	begin
 		signBig = one[12];
 		signSmall = other[12];
