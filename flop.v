@@ -26,7 +26,7 @@ module flop
 
 reg signBig, signSmall, signResult;
 reg [3:0] expBig, expSmall, expDiff, normalizer, expResult;
-reg [7:0] mantBig, mantSmall, mantSmallAligned, mantResult;
+reg [7:0] mantBig, mantSmall, mantSmallAligned, mantSumNorm, mantResult;
 reg [8:0] mantSum;
 
 always @*
@@ -35,19 +35,19 @@ begin
 	begin
 		signBig = one[12];
 		signSmall = other[12];
-		expBig = one [11:4];
-		expSmall = other[11:4];
-		mantBig = one[3:0];
-		mantSmall = other[3:0];
+		mantBig = one [11:4];
+		mantSmall = other[11:4];
+		expBig = one[3:0];
+		expSmall = other[3:0];
 	end
 	else
 	begin
 		signBig = other[12];
 		signSmall = one[12];
-		expBig = other[11:4];
-		expSmall = one[11:4];
-		mantBig = other[3:0];
-		mantSmall = one[3:0];
+		mantBig = other[11:4];
+		mantSmall = one[11:4];
+		expBig = other[3:0];
+		expSmall = one[3:0];
 	end
 
 	expDiff = expBig - expSmall;
@@ -66,10 +66,24 @@ begin
 				 mantSum[1] ? 'o6 :
 				 'o7;
 				 
-	mantResult = mantSum << normalizer;
-	expResult = mantSum[8] ? 
-					expBig - normalizer + 1:
-					expBig - normalizer;
+	mantSumNorm	= mantSum[7:0] << normalizer;
+	
+	if(mantSum[8])
+	begin
+		expResult = expBig + 1;
+		mantResult = mantSum[8:1];
+	end
+	else if (normalizer > expBig)
+	begin
+		expResult = 0;
+		mantResult = 0;
+	end
+	else
+	begin
+		expResult = expBig - normalizer;
+		mantResult = mantSumNorm;
+	end
+  
 	signResult = signBig == signSmall ? 1 : signBig;
 
 	result = {signResult, mantResult, expResult};

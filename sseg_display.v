@@ -22,7 +22,7 @@ module sseg_display
 (
 	input rst,
 	input clk,
-	input wire [7:0] value,
+	input wire [12:0] value,
 	output wire [3:0] sseg_an,
 	output wire [7:0] sseg_sig
 );
