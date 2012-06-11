@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module flop
+module flop_add
 (
 	input wire [12:0] one, other,
 	output reg [12:0] result
