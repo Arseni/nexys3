@@ -27,6 +27,8 @@ module flop_mult
 
 reg [15:0] mant_mul, mant_norm;
 reg [4:0] exp_mul, normalizer;
+reg [3:0] exp_result;
+reg [7:0] mant_result;
 reg sign_mul;
 
 always @*
@@ -40,24 +42,42 @@ begin
 		'b11 : exp_mul = other[3:0] + one[3:0];
 	endcase
 
-	normalizer = (mant_mul[15] == 'b1)? -8 :
-							 (mant_mul[14] == 'b1)? -7 :
-							 (mant_mul[13] == 'b1)? -6 :
-							 (mant_mul[12] == 'b1)? -5 :
-							 (mant_mul[11] == 'b1)? -4 :
-							 (mant_mul[10] == 'b1)? -3 :
-							 (mant_mul[ 9] == 'b1)? -2 :
-							 (mant_mul[ 8] == 'b1)? -1 :
-							 (mant_mul[ 7] == 'b1)?  0 :
-							 (mant_mul[ 6] == 'b1)?  1 :
-							 (mant_mul[ 5] == 'b1)?  2 :
-							 (mant_mul[ 4] == 'b1)?  3 :
-							 (mant_mul[ 3] == 'b1)?  4 :
-							 (mant_mul[ 2] == 'b1)?  5 :
-							 (mant_mul[ 1] == 'b1)?  6 :
-																			 7;
+	normalizer = (mant_mul[15] == 'b1)? 0 :
+							 (mant_mul[14] == 'b1)? 1 :
+							 (mant_mul[13] == 'b1)? 2 :
+							 (mant_mul[12] == 'b1)? 3 :
+							 (mant_mul[11] == 'b1)? 4 :
+							 (mant_mul[10] == 'b1)? 5 :
+							 (mant_mul[ 9] == 'b1)? 6 :
+							 (mant_mul[ 8] == 'b1)? 7 :
+							 (mant_mul[ 7] == 'b1)? 8 :
+							 (mant_mul[ 6] == 'b1)? 9 :
+							 (mant_mul[ 5] == 'b1)? 10 :
+							 (mant_mul[ 4] == 'b1)? 11 :
+							 (mant_mul[ 3] == 'b1)? 12 :
+							 (mant_mul[ 2] == 'b1)? 13 :
+							 (mant_mul[ 1] == 'b1)? 14 :
+																			15;
 																			 
 	mant_norm = mant_mul << normalizer;
+	
+	if (normalizer > exp_mul)
+	begin
+		exp_result = 0;
+		mant_result = 0;
+	end
+	else if (exp_mul - normalizer > 'b1111)
+	begin
+		exp_result = -1;
+		mant_result = 0;
+	end
+	else
+	begin
+		exp_result = exp_mul - normalizer;
+		mant_result = mant_norm[15:8];
+	end
+	
+	result = { sign_mul, mant_result, exp_result };
 
 end
 
