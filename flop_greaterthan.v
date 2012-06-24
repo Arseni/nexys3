@@ -29,22 +29,22 @@ reg isFirstGreater_abs;
 
 always @*
 begin
-	if (first[3:0] > second[3:0])
-		isFirstGreater_abs = 1;
-	else if(fist[11:0] > second[11:0])
-		isFirstGreater_abs = 1;
-	else
-		isFirstGreater_abs = 0;
-end
-
-always @*
-begin
-	if (first[12:0] == second[12:0])
-		isFirstGreater = 0;
-	else if ( first[12] == 0)
-		isFirstGreater = ~isFirstGreater_abs;
-	else
-		isFirstGreater = isFirstGreater_abs;
+	case ({first[12], second[12]})
+	'b10 : isFirstGreater = 1;
+	'b01 : isFirstGreater = 0;
+	'b11 : begin
+		if({first[3:0],first[11:4]} > {second[3:0],second[11:4]})
+			isFirstGreater = 1;
+		else
+			isFirstGreater = 0;
+	end
+	'b00 : begin
+		if({first[3:0],first[11:4]} < {second[3:0],second[11:4]})
+			isFirstGreater = 1;
+		else
+			isFirstGreater = 0;
+	end
+	endcase
 end
 
 endmodule
